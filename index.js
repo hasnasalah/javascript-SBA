@@ -10,6 +10,7 @@ addTaskBtn.addEventListener("click", function() {
 });
 function displayTask(task) {
     let parentLi = document.createElement("li");
+    parentLi.className="task-item"
     parentLi.textContent = task.Name;  
 
     let nestedUl = document.createElement("ul");
@@ -51,16 +52,6 @@ localStorage.setItem("tasks", JSON.stringify(tasksArr));
 displayTasks(tasksArr)
 }
 
-
-function deleteTasks(){
-
-
-
-}
-function editTask(){
-
-}
-
 function filterByStatus(tasksArr,status) {
     return tasksArr.filter(task => task.Status === status);
 }
@@ -97,37 +88,69 @@ let filtredArray=filterByStatus(tasksArr,selectedStatus);
 displayTasks(filtredArray);
   
 });
+taskList.addEventListener("click", function(event) {
+    if (event.target.tagName === "LI" && event.target.classList.contains("task-item")) {
+        const clickedLi = event.target;
 
+        if (clickedLi.querySelector("input")) return;
 
-let editTaskBtn=document.getElementById("editTaskBtn");
-editTaskBtn.addEventListener('click', function(){
-    let updateBtn = document.createElement("button");
-    updateBtn.textContent = "Update Status";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Enter new status";
+        input.style.marginLeft = "10px";
 
-    let statusInput = document.createElement("input");
-    statusInput.type = "text";
-    statusInput.placeholder = "Enter new status";
-    statusInput.style.display = "none"; 
+        clickedLi.appendChild(input);
+        input.focus();
 
-    parentLi.appendChild(updateBtn);
-    parentLi.appendChild(statusInput);
+        input.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                const newStatus = input.value.trim();
+                if (newStatus) {
+                    const taskName = clickedLi.firstChild.textContent;
+                    const taskObj = tasksArr.find(task => task.Name === taskName);
+                    if (taskObj) {
+                        taskObj.Status = newStatus;
+                        localStorage.setItem("tasks", JSON.stringify(tasksArr));
+                        displayTasks(tasksArr); 
+                    }
+                }
+                input.remove(); 
+            }
+        });
+    }
+});
+ deleteTask.addEventListener("click", function() {
+     let taskNameToDelete = prompt("Enter the name of the task you want to delete:");
 
-    updateBtn.addEventListener("click", function() {
-        statusInput.style.display = "inline"; 
-        statusInput.focus();
-    });
-    statusInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            const newStatus = statusInput.value.trim();
-            if (newStatus) {
-                tasksArr[index].Status = newStatus;
-                localStorage.setItem("tasks", JSON.stringify(tasksArr));
+    if (taskNameToDelete) {
+        const index = tasksArr.findIndex(task => task.Name === taskNameToDelete.trim());
+
+        if (index !== -1) {
+            if (confirm(`Are you sure you want to delete task "${tasksArr[index].Name}"?`)) {
+                tasksArr.splice(index, 1); 
+                localStorage.setItem("tasks", JSON.stringify(tasksArr)); 
                 displayTasks(tasksArr); 
+            }
+        } else {
+            alert("Task not found!");
+        }
+    }
+});
+
+function updateOverdueTasks() {
+    const today = new Date();
+
+    tasksArr.forEach(task => {
+        if (task.Status !== "Completed" && task.deadline) {
+            const taskDate = new Date(task.deadline);
+            if (taskDate < today) {
+                task.Status = "Overdue";
             }
         }
     });
 
-    taskList.appendChild(parentLi);
+    localStorage.setItem("tasks", JSON.stringify(tasksArr));
+    displayTasks(tasksArr); 
 }
-);
 
+updateOverdueTasks();

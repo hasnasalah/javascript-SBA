@@ -82,9 +82,7 @@ button:hover {
   transform: translateY(-5px);   /* Moves button 5px up */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
 }
-.task-list{
- 
-}
+
 
 #editTaskBtn, #deleteTaskBtn{
 background-color:#CD4631;
