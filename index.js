@@ -81,7 +81,7 @@ submitBtn.addEventListener("click", function() {
    
 });
 
-let categorySelect=document.getElementsByName("category");
+let categorySelect=document.getElementById("Category");
 
 categorySelect.addEventListener("change", function() {
     let selectedCategory=categorySelect.value;
@@ -90,27 +90,44 @@ let filtredArray=filterByCategory(tasksArr,selectedCategory);
 displayTasks(filtredArray);
 });
 
-let statusSelect=document.getElementsByName("status");
+let statusSelect=document.getElementById("Status");
 statusSelect.addEventListener("change", function() {
     let selectedStatus=statusSelect.value;
 let filtredArray=filterByStatus(tasksArr,selectedStatus);
 displayTasks(filtredArray);
   
 });
-function updateStatus(taskIndex) {
-    // Example: prompt user for new status
-    const newStatus = prompt("Enter new status: In progress, Completed, Overdue");
 
-    if (newStatus) {
-        tasksArr[taskIndex].Status = newStatus;    
-        localStorage.setItem("tasks", JSON.stringify(tasksArr)); 
-        displayTasks(tasksArr);                   
-    }
-}
+
 let editTaskBtn=document.getElementById("editTaskBtn");
+editTaskBtn.addEventListener('click', function(){
+    let updateBtn = document.createElement("button");
+    updateBtn.textContent = "Update Status";
 
+    let statusInput = document.createElement("input");
+    statusInput.type = "text";
+    statusInput.placeholder = "Enter new status";
+    statusInput.style.display = "none"; 
 
+    parentLi.appendChild(updateBtn);
+    parentLi.appendChild(statusInput);
 
+    updateBtn.addEventListener("click", function() {
+        statusInput.style.display = "inline"; 
+        statusInput.focus();
+    });
+    statusInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            const newStatus = statusInput.value.trim();
+            if (newStatus) {
+                tasksArr[index].Status = newStatus;
+                localStorage.setItem("tasks", JSON.stringify(tasksArr));
+                displayTasks(tasksArr); 
+            }
+        }
+    });
 
-
+    taskList.appendChild(parentLi);
+}
+);
 
